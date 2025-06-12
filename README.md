@@ -1,6 +1,6 @@
-# FastAPI Service Template
+# postulaciones-api
 
-Plantilla base para servicios backend con FastAPI y MongoDB.
+API REST desarrollada con FastAPI para gestionar las postulaciones de mascotas a solicitudes de donación.
 
 ## Características
 
@@ -8,7 +8,7 @@ Plantilla base para servicios backend con FastAPI y MongoDB.
 - MongoDB como base de datos
 - Estructura modular y escalable
 - Configuración de CORS
-- Variables de entorno con python-dotenv
+- Variables de entorno con `python-dotenv`
 - Husky para validación de mensajes de commit
 - Pre-commit hooks para linting y formateo
 
@@ -24,15 +24,16 @@ Plantilla base para servicios backend con FastAPI y MongoDB.
 1. Clonar el repositorio:
 
 ```bash
-git clone https://github.com/tu-usuario/fastapi-service-template.git
-cd fastapi-service-template
+git clone https://github.com/CobrasOrg/postulaciones-api.git
+cd postulaciones-api
 ```
 
-2. Crear y activar entorno virtual:
+2. Crear y activar el entorno virtual:
 
 ```bash
 python -m venv venv
-.\venv\Scripts\activate  # Windows
+.
+env\Scripts ctivate  # Windows
 source venv/bin/activate  # Linux/Mac
 ```
 
@@ -42,7 +43,7 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-4. Instalar dependencias de Node.js:
+4. Instalar dependencias de Node.js (para Husky y hooks):
 
 ```bash
 npm install
@@ -63,15 +64,15 @@ uvicorn main:app --reload
 
 La aplicación estará disponible en:
 
-- http://localhost:8000 - Mensaje de bienvenida
-- http://localhost:8000/api/v1/base/health - Health check
-- http://localhost:8000/docs - Documentación Swagger UI
-- http://localhost:8000/redoc - Documentación ReDoc
+- http://localhost:8000 – Mensaje de bienvenida
+- http://localhost:8000/api/v1/base/health – Health check
+- http://localhost:8000/docs – Documentación Swagger UI
+- http://localhost:8000/redoc – Documentación ReDoc
 
 ## Estructura del Proyecto
 
 ```
-fastapi-service-template/
+postulaciones-api/
 ├── app/
 │   ├── api/
 │   │   └── v1/
@@ -100,9 +101,9 @@ fastapi-service-template/
 
 ### Agregar Nuevos Endpoints
 
-1. Crear nuevo archivo en `app/api/v1/endpoints/`
-2. Definir router y endpoints
-3. Registrar router en `app/api/v1/api.py`
+1. Crear un nuevo archivo en `app/api/v1/endpoints/`
+2. Definir el router y los endpoints
+3. Registrar el router en `app/api/v1/api.py`
 
 ### Convención de Mensajes de Commit
 
@@ -118,13 +119,13 @@ tipo(alcance): descripción
 
 Tipos permitidos:
 
-- feat: Nueva característica
-- fix: Corrección de bug
-- docs: Cambios en documentación
-- style: Cambios de formato
-- refactor: Refactorización de código
-- test: Agregar o modificar tests
-- chore: Cambios en tareas de mantenimiento
+- `feat`: Nueva característica
+- `fix`: Corrección de bug
+- `docs`: Cambios en documentación
+- `style`: Cambios de formato (espacios, punto y coma, etc.)
+- `refactor`: Refactorización de código
+- `test`: Agregar o modificar tests
+- `chore`: Cambios en tareas de mantenimiento
 
 ## Licencia
 
