@@ -20,7 +20,6 @@ fake_db: dict[str, list[ApplicationDetail]] = {}
     status_code=200,
     responses={
         200: {"description": "Respuesta exitosa."},
-        400: {"description": "Datos inválidos."},
         409: {"description": "Ya existe una postulación con ese correo."},
         422: {"description": "Tipo de sangre no compatible."},
     },
@@ -52,6 +51,7 @@ def create_application(id: str, application: ApplicationCreate):
     "/api/solicitudes/{id}/postulaciones",
     response_model=List[ApplicationShort],
     responses={200: {"description": "Respuesta exitosa."},
+               422: {"description": "Error de validación."},
                404: {"description": "No hay postulaciones para esta solicitud."}}
 )
 def list_applications(id: str):
@@ -65,6 +65,7 @@ def list_applications(id: str):
     "/api/solicitudes/{id}/postulaciones/{postulacionId}",
     response_model=ApplicationDetail,
     responses={200: {"description": "Respuesta exitosa."},
+               422: {"description": "Error de validación"},
                404: {"description": "Postulación no encontrada."}}
 )
 def get_application(id: str, postulacionId: str):
@@ -79,7 +80,9 @@ def get_application(id: str, postulacionId: str):
     "/api/solicitudes/{id}/postulaciones/{postulacionId}/status",
     response_model=ApplicationShort,
     responses={200: {"description": "Respuesta exitosa."},
+               422: {"description": "Error de validación"},
                404: {"description": "Postulación no encontrada."}}
+               
 )
 def update_application_status(id: str, postulacionId: str, status_update: ApplicationStatusUpdate):
     apps = fake_db.get(id, [])
