@@ -32,8 +32,7 @@ cd postulaciones-api
 
 ```bash
 python -m venv venv
-.
-env\Scripts ctivate  # Windows
+.\venv\Scripts\activate   # Windows
 source venv/bin/activate  # Linux/Mac
 ```
 
