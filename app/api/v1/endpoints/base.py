@@ -1,93 +1,82 @@
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, status, Depends
 from typing import List
+from datetime import datetime
 from app.schemas.base import (
     ApplicationCreate,
     ApplicationShort,
     ApplicationDetail,
     ApplicationStatusUpdate,
-    Species,
+    ApplicationStatusResponse,
+    ApplicationCreatedResponse,
 )
-from datetime import datetime
 
 router = APIRouter()
 
 fake_db: dict[str, list[ApplicationDetail]] = {}
 
 
-@router.post(
-    "/api/solicitudes/{id}/postulaciones",
-    response_model=ApplicationShort,
-    status_code=200,
-    responses={
-        200: {"description": "Respuesta exitosa."},
-        409: {"description": "Ya existe una postulación con ese correo."},
-        422: {"description": "Tipo de sangre no compatible."},
-    },
-)
-def create_application(id: str, application: ApplicationCreate):
-    # Validar que no exista otra postulación del mismo dueño (por email)
-    existing_apps = fake_db.get(id, [])
-    for app in existing_apps:
-        if app.ownerEmail == application.ownerEmail:
-            raise HTTPException(
-                status_code=409,
-                detail=f"Ya existe una postulación del correo {application.ownerEmail} para la solicitud {id}."
-            )
-
-    # Crear nueva postulación
-    app_id = f"APP-{len(existing_apps) + 1:03}"
-    app_data = ApplicationDetail(
-        id=app_id,
-        applicationDate=datetime.utcnow(),
-        status="pending",
-        **application.dict()
-    )
-    fake_db.setdefault(id, []).append(app_data)
-
-    return app_data
-
-
 @router.get(
-    "/api/solicitudes/{id}/postulaciones",
+    "/solicitudes/{solicitud_id}/postulaciones",
     response_model=List[ApplicationShort],
-    responses={200: {"description": "Respuesta exitosa."},
-               422: {"description": "Error de validación."},
-               404: {"description": "No hay postulaciones para esta solicitud."}}
+    status_code=status.HTTP_200_OK,
 )
-def list_applications(id: str):
-    apps = fake_db.get(id)
-    if not apps:
-        raise HTTPException(status_code=404, detail="No hay postulaciones para la solicitud especificada.")
-    return apps
+def get_postulaciones(solicitud_id: str):
+    return fake_db.get(solicitud_id, [])
 
 
 @router.get(
-    "/api/solicitudes/{id}/postulaciones/{postulacionId}",
+    "/solicitudes/{solicitud_id}/postulaciones/{postulacion_id}",
     response_model=ApplicationDetail,
-    responses={200: {"description": "Respuesta exitosa."},
-               422: {"description": "Error de validación"},
-               404: {"description": "Postulación no encontrada."}}
+    status_code=status.HTTP_200_OK,
 )
-def get_application(id: str, postulacionId: str):
-    apps = fake_db.get(id, [])
-    for app in apps:
-        if app.id == postulacionId:
-            return app
-    raise HTTPException(status_code=404, detail="Postulación no encontrada.")
+def get_postulacion(solicitud_id: str, postulacion_id: str):
+    postulaciones = fake_db.get(solicitud_id, [])
+    for p in postulaciones:
+        if p.id == postulacion_id:
+            return p
+    raise HTTPException(status_code=404, detail="Postulación no encontrada")
 
 
 @router.patch(
-    "/api/solicitudes/{id}/postulaciones/{postulacionId}/status",
-    response_model=ApplicationShort,
-    responses={200: {"description": "Respuesta exitosa."},
-               422: {"description": "Error de validación"},
-               404: {"description": "Postulación no encontrada."}}
-               
+    "/solicitudes/{solicitud_id}/postulaciones/{postulacion_id}/status",
+    response_model=ApplicationStatusResponse,
+    status_code=status.HTTP_200_OK,
 )
-def update_application_status(id: str, postulacionId: str, status_update: ApplicationStatusUpdate):
-    apps = fake_db.get(id, [])
-    for app in apps:
-        if app.id == postulacionId:
-            app.status = status_update.status
-            return app
-    raise HTTPException(status_code=404, detail="Postulación no encontrada.")
+def update_postulacion_status(solicitud_id: str, postulacion_id: str, payload: ApplicationStatusUpdate):
+    postulaciones = fake_db.get(solicitud_id, [])
+    for i, p in enumerate(postulaciones):
+        if p.id == postulacion_id:
+            p.status = payload.status
+            p.updatedAt = datetime.utcnow()
+            fake_db[solicitud_id][i] = p
+            return ApplicationStatusResponse(id=p.id, status=p.status, updatedAt=p.updatedAt)
+    raise HTTPException(status_code=404, detail="Postulación no encontrada")
+
+
+@router.post(
+    "/solicitudes/{solicitud_id}/postulaciones",
+    response_model=ApplicationCreatedResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_postulacion(solicitud_id: str, body: ApplicationCreate):
+    # Validación de email duplicado
+    for p in fake_db.get(solicitud_id, []):
+        if p.ownerEmail == body.ownerEmail:
+            raise HTTPException(status_code=409, detail="Ya existe una postulación con este correo electrónico.")
+
+    new_id = f"app_{len(fake_db.get(solicitud_id, [])) + 1}"
+    now = datetime.utcnow()
+    new_postulacion = ApplicationDetail(
+        id=new_id,
+        solicitudId=solicitud_id,
+        mascotaId="pet_" + new_id,
+        ownerId="owner_" + new_id,
+        status="pending",
+        applicationDate=now,
+        createdAt=now,
+        updatedAt=now,
+        **body.dict(),
+    )
+
+    fake_db.setdefault(solicitud_id, []).append(new_postulacion)
+    return ApplicationCreatedResponse(id=new_id, solicitudId=solicitud_id, status="pending", createdAt=now)
