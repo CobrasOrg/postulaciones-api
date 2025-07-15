@@ -1,16 +1,17 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from app.core.config import settings
+import os
+from dotenv import load_dotenv
 
-class Database:
-    client: AsyncIOMotorClient = None
+load_dotenv()
 
-db = Database()
+MONGO_URL = os.getenv("MONGO_URL")
 
-async def get_database() -> AsyncIOMotorClient:
-    return db.client[settings.MONGODB_DB_NAME]
+if not MONGO_URL:
+    raise ValueError("MONGO_URL no está definido en el entorno.")
 
-async def connect_to_mongo():
-    db.client = AsyncIOMotorClient(settings.MONGODB_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 
-async def close_mongo_connection():
-    db.client.close() 
+
+db = client.get_default_database()
+
+postulaciones_collection = db["postulaciones"]
