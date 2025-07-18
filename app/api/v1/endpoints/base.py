@@ -10,6 +10,7 @@ from app.schemas.base import (
     ApplicationCreatedResponse,
 )
 from app.db.database import postulaciones_collection
+import uuid
 
 router = APIRouter()
 
@@ -71,7 +72,7 @@ async def create_postulacion(solicitud_id: str, body: ApplicationCreate):
         raise HTTPException(status_code=409, detail="Ya existe una postulación con este correo electrónico.")
 
     count = await postulaciones_collection.count_documents({"solicitudId": solicitud_id})
-    new_id = f"app_{count + 1}"
+    new_id = str(uuid.uuid4())
     now = datetime.utcnow()
 
     doc = {
