@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.api import api_router
 from prometheus_fastapi_instrumentator import Instrumentator
 
-app = FastAPI(title="API de Postulaciones de Mascotas")
+app = FastAPI(title="API de Postulaciones de Mascotas",
+    version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
