@@ -12,6 +12,12 @@ API REST desarrollada con FastAPI para gestionar las postulaciones de mascotas a
 - Husky para validación de mensajes de commit
 - Pre-commit hooks para linting y formateo
 
+## Despliegue
+
+La API está disponible en: 
+https://postulaciones-api-production.up.railway.app/docs
+
+
 ## Requisitos
 
 - Python 3.8+
@@ -67,6 +73,7 @@ La aplicación estará disponible en:
 - http://localhost:8000/api/v1/base/health – Health check
 - http://localhost:8000/docs – Documentación Swagger UI
 - http://localhost:8000/redoc – Documentación ReDoc
+
 
 ## Estructura del Proyecto
 
