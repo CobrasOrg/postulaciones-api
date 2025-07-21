@@ -58,3 +58,4 @@ class ApplicationCreatedResponse(BaseModel):
     solicitudId: str
     status: Literal["pending"]
     createdAt: datetime
+

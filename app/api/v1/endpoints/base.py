@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Path, status, Depends
 from typing import List
 from datetime import datetime
 from app.schemas.base import (
@@ -9,6 +9,7 @@ from app.schemas.base import (
     ApplicationStatusResponse,
     ApplicationCreatedResponse,
 )
+
 from app.db.database import postulaciones_collection
 import uuid
 
@@ -20,10 +21,12 @@ router = APIRouter()
     response_model=List[ApplicationShort],
     status_code=status.HTTP_200_OK,
 )
+
 async def get_postulaciones(solicitud_id: str):
     cursor = postulaciones_collection.find({"solicitudId": solicitud_id})
     docs = await cursor.to_list(length=None)
     return [ApplicationShort(**doc) for doc in docs]
+
 
 
 @router.get(
@@ -31,6 +34,7 @@ async def get_postulaciones(solicitud_id: str):
     response_model=ApplicationDetail,
     status_code=status.HTTP_200_OK,
 )
+
 async def get_postulacion(solicitud_id: str, postulacion_id: str):
     doc = await postulaciones_collection.find_one({
         "solicitudId": solicitud_id,
@@ -41,11 +45,14 @@ async def get_postulacion(solicitud_id: str, postulacion_id: str):
     return ApplicationDetail(**doc)
 
 
+
 @router.patch(
     "/solicitudes/{solicitud_id}/postulaciones/{postulacion_id}/status",
     response_model=ApplicationStatusResponse,
     status_code=status.HTTP_200_OK,
+
 )
+
 async def update_postulacion_status(solicitud_id: str, postulacion_id: str, payload: ApplicationStatusUpdate):
     updated_at = datetime.utcnow()
     result = await postulaciones_collection.find_one_and_update(
@@ -95,3 +102,4 @@ async def create_postulacion(solicitud_id: str, body: ApplicationCreate):
         status="pending",
         createdAt=now
     )
+
