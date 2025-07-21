@@ -1,73 +1,61 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
-from datetime import date, datetime
-from enum import Enum
+from typing import Optional, Literal
+from datetime import datetime
 
+class ApplicationBase(BaseModel):
+    petName: str
+    species: Literal["canine", "feline"]
+    breed: str
+    age: int
+    weight: float
+    bloodType: str
+    lastVaccination: datetime
+    healthStatus: str
+    ownerName: str
+    ownerPhone: str
+    ownerEmail: EmailStr
+    ownerAddress: Optional[str] = None
 
-class Species(str, Enum):
-    feline = "feline"
-    canine = "canine"
-
-
-class BloodType(str, Enum):
-    DEA_1_1_POS = "DEA 1.1+"
-    DEA_1_1_NEG = "DEA 1.1-"
-    DEA_1_2 = "DEA 1.2"
-    DEA_3 = "DEA 3"
-    DEA_4 = "DEA 4"
-    DEA_5 = "DEA 5"
-    DEA_7 = "DEA 7"
-    DEA_8 = "DEA 8"
-    A = "A"
-    B = "B"
-    AB = "AB"
-
-
-
-class ApplicationStatus(str, Enum):
-    pending = "pending"
-    approved = "approved"
-    rejected = "rejected"
-
-
-class ApplicationCreate(BaseModel):
-    petName: str = Field(..., example="Max")
-    species: Species = Field(..., example="canine")
-    breed: str = Field(..., example="Pastor Alemán")
-    age: int = Field(..., example=3)
-    weight: float = Field(..., example=25.0)
-    bloodType: BloodType = Field(..., example="DEA 1.1+")
-    lastVaccination: date = Field(..., example="2024-05-01")
-    healthStatus: str = Field(..., example="Vacunas al día")
-    medications: str = Field(..., example="Ninguno")
-    ownerName: str = Field(..., example="Juan Pérez")
-    ownerPhone: str = Field(..., example="+573001234567")
-    ownerEmail: EmailStr = Field(..., example="juan.perez@email.com")
-    ownerAddress: str = Field(..., example="Calle 100 #15-20, Bogotá")
-    termsAccepted: bool = Field(..., example=True)
+class ApplicationCreate(ApplicationBase):
+    petPhoto: Optional[str] = None
 
 
 class ApplicationShort(BaseModel):
-    id: str = Field(..., example="APP-001")
-    petName: str = Field(..., example="Max")
-    species: Species = Field(..., example="canine")
-    breed: str = Field(..., example="Pastor Alemán")
-    weight: float = Field(..., example=25.0)
-    bloodType: BloodType = Field(..., example="DEA 1.1+")
-    ownerName: str = Field(..., example="Juan Pérez")
-    ownerPhone: str = Field(..., example="+573001234567")
-    ownerEmail: EmailStr = Field(..., example="juan.perez@email.com")
-    status: ApplicationStatus = Field(..., example="pending")
+    id: str
+    petName: str
+    ownerName: str
+    ownerPhone: str
+    ownerEmail: EmailStr
+    species: Literal["canine", "feline"]
+    breed: str
+    age: int
+    weight: float
+    bloodType: str
+    status: Literal["pending", "approved", "rejected"]
+    createdAt: datetime
 
 
-class ApplicationDetail(ApplicationShort):
-    age: int = Field(..., example=3)
-    lastVaccination: date = Field(..., example="2024-05-01")
-    healthStatus: str = Field(..., example="Vacunas al día")
-    medications: str = Field(..., example="Ninguno")
-    ownerAddress: str = Field(..., example="Calle 100 #15-20, Bogotá")
-    applicationDate: datetime = Field(..., example="2025-06-12T14:30:00")
-
+class ApplicationDetail(ApplicationBase):
+    id: str
+    solicitudId: str
+    mascotaId: str
+    ownerId: str
+    status: Literal["pending", "approved", "rejected"]
+    applicationDate: datetime
+    createdAt: datetime
+    updatedAt: datetime
 
 class ApplicationStatusUpdate(BaseModel):
-    status: ApplicationStatus = Field(..., example="approved")
+    status: Literal["approved", "rejected"]
+
+class ApplicationStatusResponse(BaseModel):
+    id: str
+    status: Literal["approved", "rejected"]
+    updatedAt: datetime
+
+class ApplicationCreatedResponse(BaseModel):
+    id: str
+    solicitudId: str
+    status: Literal["pending"]
+    createdAt: datetime
+
